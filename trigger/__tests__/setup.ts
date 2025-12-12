@@ -38,3 +38,9 @@ global.console = {
 
 // Export the mock for tests to use
 export { mockFetch }
+
+// Helper to reset mocks
+export const resetMocks = () => {
+  mockFetch.mockClear()
+  vi.clearAllMocks()
+}

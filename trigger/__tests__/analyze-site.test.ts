@@ -1,14 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-// Import the task run function directly for testing
+import { describe, it, expect, beforeEach } from 'vitest'
 import { analyzeSiteTask } from '../analyze-site'
-
-// Import the mock from setup
-import { mockFetch } from './setup'
+import { mockFetch, resetMocks } from './setup'
 
 describe('analyzeSiteTask', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    resetMocks()
   })
 
   it('successfully analyzes site and extracts brand constraints', async () => {

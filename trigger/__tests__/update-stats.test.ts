@@ -1,13 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { updateStatsTask } from '../update-stats'
-
-// Access the mock from global
-const mockFetch = global.fetch as any
+import { mockFetch, resetMocks } from './setup'
 
 describe('updateStatsTask', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    mockFetch.mockClear()
+    resetMocks()
   })
 
   it('successfully updates stats for all sites', async () => {

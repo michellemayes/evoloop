@@ -1,13 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { generateVariantsTask } from '../generate-variants'
-
-// Access the mock from global
-const mockFetch = global.fetch as any
+import { mockFetch, resetMocks } from './setup'
 
 describe('generateVariantsTask', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    mockFetch.mockClear()
+    resetMocks()
   })
 
   it('generates variants successfully', async () => {

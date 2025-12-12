@@ -213,6 +213,116 @@
     </aside>
   </section>
 
+  <!-- Slide 9: Onboarding Flow -->
+  <section>
+    <h2>Up and running in <span class="highlight">3 steps</span></h2>
+    <div style="margin-top: var(--space-md);">
+      <div class="fragment fade-up" style="display: flex; align-items: flex-start; gap: var(--space-md); margin-bottom: var(--space-md);">
+        <div class="stat" style="font-size: 1.5em; min-width: 50px;">1</div>
+        <div>
+          <h3 style="margin-bottom: var(--space-xs); font-size: 1em;">Paste your URL</h3>
+          <p class="muted" style="font-size: 0.75em;">We scrape your page and extract brand constraints—colors, fonts, tone, imagery.</p>
+        </div>
+      </div>
+      <div class="fragment fade-up" style="display: flex; align-items: flex-start; gap: var(--space-md); margin-bottom: var(--space-md);">
+        <div class="stat" style="font-size: 1.5em; min-width: 50px;">2</div>
+        <div>
+          <h3 style="margin-bottom: var(--space-xs); font-size: 1em;">Set your conversion goal</h3>
+          <p class="muted" style="font-size: 0.75em;">Click, form submission, or URL-based. We auto-detect if you're not sure.</p>
+        </div>
+      </div>
+      <div class="fragment fade-up" style="display: flex; align-items: flex-start; gap: var(--space-md);">
+        <div class="stat" style="font-size: 1.5em; min-width: 50px;">3</div>
+        <div>
+          <h3 style="margin-bottom: var(--space-xs); font-size: 1em;">Install the script</h3>
+          <p class="muted" style="font-size: 0.75em;">One line in your <code>&lt;head&gt;</code>. Anti-flicker built in.</p>
+          <pre style="margin-top: var(--space-xs);"><code class="language-html">&lt;script src="https://evoloop.io/v1/runtime.js" data-site="abc123"&gt;&lt;/script&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+    <p class="fragment fade-up muted" style="margin-top: var(--space-md); font-size: 0.8em;">
+      First variants generated automatically. Experiment starts immediately.
+    </p>
+    <aside class="notes">
+      Show how lightweight the setup is.
+    </aside>
+  </section>
+
+  <!-- Slide 10: Dashboard Tour (Vertical stack) -->
+  <section>
+    <section>
+      <h2>See what matters, <span class="highlight">dive deeper when you want</span></h2>
+      <p class="muted" style="margin-top: var(--space-sm);">Three dashboard views for different needs</p>
+      <p style="margin-top: var(--space-lg); font-size: 0.8em;">↓ Press down to explore each view</p>
+    </section>
+
+    <section>
+      <h3><span class="badge">Minimal View</span></h3>
+      <p style="margin-top: var(--space-sm);">Current status at a glance</p>
+      <div class="card" style="margin-top: var(--space-md); max-width: 500px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <p class="muted" style="font-size: 0.6em; margin: 0;">BEST PERFORMER</p>
+            <p style="font-size: 0.9em; margin: var(--space-xs) 0;"><strong>Variant B</strong></p>
+          </div>
+          <div style="text-align: right;">
+            <p class="muted" style="font-size: 0.6em; margin: 0;">LIFT</p>
+            <p style="font-size: 1.2em; margin: var(--space-xs) 0; color: var(--color-success);"><strong>+23%</strong></p>
+          </div>
+          <div style="text-align: right;">
+            <p class="muted" style="font-size: 0.6em; margin: 0;">CONFIDENCE</p>
+            <p style="font-size: 0.9em; margin: var(--space-xs) 0;"><strong>94%</strong></p>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top: var(--space-md); font-size: 0.75em;">One card. Everything you need to know.</p>
+    </section>
+
+    <section>
+      <h3><span class="badge">Timeline View</span></h3>
+      <p style="margin-top: var(--space-sm);">Git-log style experiment history</p>
+      <div style="margin-top: var(--space-md); max-width: 550px; font-size: 0.7em; font-family: var(--font-mono);">
+        <div style="padding: var(--space-xs) 0; border-left: 3px solid var(--color-success); padding-left: var(--space-sm);">
+          <span class="muted">2h ago</span> · <strong style="color: var(--color-success);">Variant B promoted to winner</strong>
+        </div>
+        <div style="padding: var(--space-xs) 0; border-left: 3px solid var(--color-primary); padding-left: var(--space-sm); margin-top: var(--space-xs);">
+          <span class="muted">1d ago</span> · <span style="color: var(--color-primary);">Variant C generated</span> (CTA copy test)
+        </div>
+        <div style="padding: var(--space-xs) 0; border-left: 3px solid var(--color-warning); padding-left: var(--space-sm); margin-top: var(--space-xs);">
+          <span class="muted">3d ago</span> · <span style="color: var(--color-warning);">Variant A killed</span> (underperforming)
+        </div>
+        <div style="padding: var(--space-xs) 0; border-left: 3px solid #e2e8f0; padding-left: var(--space-sm); margin-top: var(--space-xs);">
+          <span class="muted">5d ago</span> · Experiment started
+        </div>
+      </div>
+      <p class="muted" style="margin-top: var(--space-md); font-size: 0.75em;">See every decision. Understand evolution.</p>
+    </section>
+
+    <section>
+      <h3><span class="badge">Stats Deep-Dive</span></h3>
+      <p style="margin-top: var(--space-sm);">For the data nerds</p>
+      <div class="grid-2" style="margin-top: var(--space-md); max-width: 600px;">
+        <div class="card" style="padding: var(--space-sm);">
+          <p class="muted" style="font-size: 0.6em; margin: 0;">POSTERIOR DISTRIBUTION</p>
+          <p style="font-size: 0.8em; margin-top: var(--space-xs);">Beta(α=142, β=2847)</p>
+        </div>
+        <div class="card" style="padding: var(--space-sm);">
+          <p class="muted" style="font-size: 0.6em; margin: 0;">95% CREDIBLE INTERVAL</p>
+          <p style="font-size: 0.8em; margin-top: var(--space-xs);">4.2% – 5.6%</p>
+        </div>
+        <div class="card" style="padding: var(--space-sm);">
+          <p class="muted" style="font-size: 0.6em; margin: 0;">PROBABILITY OF BEST</p>
+          <p style="font-size: 0.8em; margin-top: var(--space-xs); color: var(--color-success);"><strong>87.3%</strong></p>
+        </div>
+        <div class="card" style="padding: var(--space-sm);">
+          <p class="muted" style="font-size: 0.6em; margin: 0;">SAMPLES</p>
+          <p style="font-size: 0.8em; margin-top: var(--space-xs);">2,989 visitors</p>
+        </div>
+      </div>
+      <p class="muted" style="margin-top: var(--space-md); font-size: 0.75em;">Real statistics. Not vanity metrics.</p>
+    </section>
+  </section>
+
 </div>
   </div>
 

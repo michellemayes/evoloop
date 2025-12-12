@@ -80,7 +80,7 @@ class Event(Base):
     variant_id = Column(UUID(as_uuid=True), ForeignKey("variants.id"), nullable=False)
     visitor_id = Column(String(255), nullable=False, index=True)
     event_type = Column(String(50), nullable=False)
-    metadata = Column(JSON, default=dict)
+    event_metadata = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     site = relationship("Site", back_populates="events")

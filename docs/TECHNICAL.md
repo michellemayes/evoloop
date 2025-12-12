@@ -333,10 +333,8 @@ class ThompsonSampler:
 # Database
 DATABASE_URL=postgresql://user:password@host:5432/dbname
 
-# Auth (Stack Auth)
-NEXT_PUBLIC_STACK_PROJECT_ID=your-project-id
-NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your-key
-STACK_SECRET_SERVER_KEY=your-secret
+# Auth (Neon Auth)
+NEXT_PUBLIC_NEON_AUTH_URL=https://ep-xxx.neonauth.us-east-2.aws.neon.build/neondb/auth
 
 # API
 NEXT_PUBLIC_API_URL=http://localhost:8000

@@ -1,6 +1,6 @@
 "use client"
 
-import { useUser } from "@stackframe/stack"
+import { authClient } from "@/lib/auth-client"
 import Link from "next/link"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button"
 import { Bell, LogOut, Settings, User } from "lucide-react"
 
 export function Header() {
-  const user = useUser()
-  const userEmail = user?.primaryEmail || "user@example.com"
-  const userInitial = (user?.displayName || userEmail).charAt(0).toUpperCase()
+  const { data: session } = authClient.useSession()
+  const user = session?.user
+  const userEmail = user?.email || "user@example.com"
+  const userInitial = (user?.name || userEmail).charAt(0).toUpperCase()
 
   return (
     <header className="flex items-center justify-between h-16 px-6 border-b bg-card">
@@ -39,7 +40,7 @@ export function Header() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.displayName || "User"}</p>
+                <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {userEmail}
                 </p>
@@ -47,20 +48,20 @@ export function Header() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/handler/account-settings">
+              <Link href="/auth/account">
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/handler/account-settings">
+              <Link href="/dashboard/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="text-destructive">
-              <Link href="/handler/sign-out">
+              <Link href="/auth/sign-out">
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </Link>

@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import { stackServerApp } from "@/lib/stack"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
 
@@ -14,13 +13,12 @@ function HeaderSkeleton() {
   )
 }
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Page-level protection - redirects to sign-in if not authenticated
-  await stackServerApp.getUser({ or: "redirect" })
+  // Auth protection is handled by neonAuthMiddleware in proxy.ts
 
   return (
     <div className="flex h-screen bg-background">

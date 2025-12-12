@@ -15,7 +15,7 @@ Autonomous landing page optimization engine that uses AI to generate, test, and 
 - **Frontend**: Next.js 16, React 19, shadcn/ui, Tailwind CSS
 - **Backend**: FastAPI (Python), SQLAlchemy, Alembic
 - **Database**: Neon PostgreSQL
-- **Auth**: Neon Auth (Stack Auth)
+- **Auth**: Neon Auth (Better Auth)
 - **Background Jobs**: Trigger.dev
 - **Deployment**: Vercel
 
@@ -151,9 +151,7 @@ python -m pytest tests/ -v
    |----------|-------------|
    | `DATABASE_URL` | Neon PostgreSQL connection string |
    | `NEXT_PUBLIC_API_URL` | Your production URL |
-   | `NEXT_PUBLIC_STACK_PROJECT_ID` | Stack Auth project ID |
-   | `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` | Stack Auth publishable key |
-   | `STACK_SECRET_SERVER_KEY` | Stack Auth secret key |
+   | `NEON_AUTH_BASE_URL` | Neon Auth URL (copy the value from Neon Console → Auth → Configuration) |
    | `OPENROUTER_API_KEY` | OpenRouter API key for AI features |
 
 4. **Deploy the Python Backend**

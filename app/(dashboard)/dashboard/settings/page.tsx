@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense } from "react"
-import { useUser } from "@stackframe/stack"
+import { authClient } from "@/lib/auth-client"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -14,7 +14,8 @@ import {
 import Link from "next/link"
 
 function SettingsContent() {
-  const user = useUser()
+  const { data: session } = authClient.useSession()
+  const user = session?.user
 
   return (
     <div className="space-y-6">
@@ -40,11 +41,11 @@ function SettingsContent() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Display Name</p>
-              <p className="font-medium">{user?.displayName || "Not set"}</p>
+              <p className="font-medium">{user?.name || "Not set"}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">Email</p>
-              <p className="font-medium">{user?.primaryEmail || "Not set"}</p>
+              <p className="font-medium">{user?.email || "Not set"}</p>
             </div>
           </div>
           <Separator />
@@ -55,7 +56,7 @@ function SettingsContent() {
         </CardContent>
         <CardFooter>
           <Button asChild>
-            <Link href="/handler/account-settings">
+            <Link href="/auth/account">
               Manage Account
               <ExternalLink className="w-4 h-4 ml-2" />
             </Link>
@@ -83,7 +84,7 @@ function SettingsContent() {
               </p>
             </div>
             <Button variant="outline" asChild>
-              <Link href="/handler/account-settings">
+              <Link href="/auth/account">
                 Manage
               </Link>
             </Button>
@@ -96,7 +97,7 @@ function SettingsContent() {
               </p>
             </div>
             <Button variant="outline" asChild>
-              <Link href="/handler/account-settings">
+              <Link href="/auth/account">
                 Manage
               </Link>
             </Button>
@@ -121,7 +122,7 @@ function SettingsContent() {
               </p>
             </div>
             <Button variant="destructive" asChild>
-              <Link href="/handler/account-settings">
+              <Link href="/auth/account">
                 Delete Account
               </Link>
             </Button>

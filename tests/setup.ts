@@ -30,19 +30,30 @@ vi.mock('next/link', () => ({
   default: ({ children }: any) => children,
 }))
 
-// Mock Stack Auth
-vi.mock('@stackframe/stack', () => ({
-  StackProvider: ({ children }: { children: React.ReactNode }) => React.createElement('div', null, children),
-  StackTheme: ({ children }: { children: React.ReactNode }) => React.createElement('div', null, children),
-  useUser: () => ({ user: null, isLoading: false }),
-  useStackApp: () => ({
-    signIn: vi.fn(),
-    signOut: vi.fn(),
-  }),
+// Mock Neon Auth
+vi.mock('@neondatabase/neon-auth-next', () => ({
+  createAuthClient: vi.fn(() => ({
+    useSession: () => ({ data: { user: null }, isLoading: false }),
+    getSession: vi.fn(() => Promise.resolve(null)),
+  })),
 }))
 
-vi.mock('@/lib/stack', () => ({
-  stackServerApp: {},
+vi.mock('@neondatabase/neon-auth-ui', () => ({
+  AuthView: () => React.createElement('div', null, 'Auth View'),
+  NeonAuthUIProvider: ({ children }: { children: React.ReactNode }) => React.createElement('div', null, children),
+}))
+
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    useSession: () => ({ data: { user: null }, isLoading: false }),
+    getSession: vi.fn(() => Promise.resolve(null)),
+  },
+}))
+
+vi.mock('@/lib/auth', () => ({
+  authClient: {
+    getSession: vi.fn(() => Promise.resolve(null)),
+  },
 }))
 
 // Mock animated components to render children immediately

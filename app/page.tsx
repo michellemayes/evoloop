@@ -20,10 +20,10 @@ export default function Home() {
             <span className="font-semibold text-lg">Evoloop</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/handler/sign-in">
+            <Link href="/auth/sign-in">
               <Button variant="ghost" size="sm">Sign in</Button>
             </Link>
-            <Link href="/handler/sign-up">
+            <Link href="/auth/sign-up">
               <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
                 Get Started
               </Button>
@@ -56,7 +56,7 @@ export default function Home() {
           </AnimatedSection>
           <AnimatedSection delay={300}>
             <div className="flex items-center justify-center gap-4">
-              <Link href="/handler/sign-up">
+              <Link href="/auth/sign-up">
                 <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 h-12 px-8 text-base">
                   Start for $5
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -202,7 +202,7 @@ export default function Home() {
                       Basic analytics
                     </li>
                   </ul>
-                  <Link href="/handler/sign-up" className="block">
+                  <Link href="/auth/sign-up" className="block">
                     <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
                       Get Started
                     </Button>
@@ -244,7 +244,7 @@ export default function Home() {
                       Full analytics dashboard
                     </li>
                   </ul>
-                  <Link href="/handler/sign-up" className="block">
+                  <Link href="/auth/sign-up" className="block">
                     <Button className="w-full bg-emerald-500 hover:bg-emerald-600">
                       Get Started
                     </Button>
@@ -281,7 +281,7 @@ export default function Home() {
                       Advanced stats & exports
                     </li>
                   </ul>
-                  <Link href="/handler/sign-up" className="block">
+                  <Link href="/auth/sign-up" className="block">
                     <Button className="w-full" variant="outline">
                       Go Pro
                     </Button>
@@ -314,7 +314,7 @@ export default function Home() {
             </p>
           </AnimatedSection>
           <AnimatedSection delay={200}>
-            <Link href="/handler/sign-up">
+            <Link href="/auth/sign-up">
               <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 h-14 px-10 text-lg">
                 Start for $5
                 <ArrowRight className="w-5 h-5 ml-2" />

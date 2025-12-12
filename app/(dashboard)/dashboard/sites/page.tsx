@@ -50,7 +50,8 @@ export default function SitesPage() {
       const res = await fetch("/api/sites")
       if (res.ok) {
         const data = await res.json()
-        setSites(data)
+        // Handle both array response and {sites: []} response
+        setSites(Array.isArray(data) ? data : (data.sites || []))
       }
     } catch (error) {
       console.error("Failed to fetch sites:", error)

@@ -1,30 +1,107 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   BarChart3,
   TrendingUp,
   Users,
   MousePointerClick,
-  ArrowUpRight,
-  ArrowDownRight
+  Globe,
+  Plus,
+  Loader2
 } from "lucide-react"
 
+interface Site {
+  id: string
+  url: string
+  variant_count?: number
+  visitors?: number
+  conversions?: number
+  conversion_rate?: number
+}
+
+interface Variant {
+  id: string
+  site_id: string
+  site_url?: string
+  headline?: string
+  impressions: number
+  conversions: number
+  conversion_rate: number
+}
+
 export default function AnalyticsPage() {
-  // Mock data - would come from API
-  const stats = {
-    totalVisitors: 12847,
-    totalConversions: 743,
-    avgConversionRate: 5.78,
-    improvementVsBaseline: 34.2,
+  const [sites, setSites] = useState<Site[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch("/api/sites")
+      if (res.ok) {
+        const data = await res.json()
+        setSites(Array.isArray(data) ? data : (data.sites || []))
+      }
+    } catch (error) {
+      console.error("Failed to fetch data:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const topVariants = [
-    { id: "v1", site: "example.com", headline: "10x your productivity", conversionRate: 7.2, visitors: 2341 },
-    { id: "v2", site: "example.com", headline: "Ship faster with AI", conversionRate: 6.8, visitors: 1987 },
-    { id: "v3", site: "landing.io", headline: "Build without limits", conversionRate: 6.1, visitors: 1654 },
-  ]
+  // Calculate aggregate stats from real data
+  const stats = {
+    totalVisitors: sites.reduce((sum, site) => sum + (site.visitors || 0), 0),
+    totalConversions: sites.reduce((sum, site) => sum + (site.conversions || 0), 0),
+    avgConversionRate: sites.length > 0
+      ? sites.reduce((sum, site) => sum + (site.conversion_rate || 0), 0) / sites.length
+      : 0,
+    totalVariants: sites.reduce((sum, site) => sum + (site.variant_count || 0), 0),
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  // Empty state
+  if (sites.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Analytics</h2>
+          <p className="text-muted-foreground">
+            Track performance across all your sites and experiments.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <BarChart3 className="w-16 h-16 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No analytics data yet</h3>
+            <p className="text-muted-foreground text-center mb-6 max-w-md">
+              Add your first site and start running experiments to see analytics data here.
+            </p>
+            <Button asChild>
+              <Link href="/dashboard/sites">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Your First Site
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -45,11 +122,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalVisitors.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-emerald-500 inline-flex items-center">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                12%
-              </span>{" "}
-              from last month
+              Across {sites.length} site{sites.length !== 1 ? "s" : ""}
             </p>
           </CardContent>
         </Card>
@@ -62,11 +135,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalConversions.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-emerald-500 inline-flex items-center">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                18%
-              </span>{" "}
-              from last month
+              Total successful conversions
             </p>
           </CardContent>
         </Card>
@@ -77,99 +146,87 @@ export default function AnalyticsPage() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.avgConversionRate}%</div>
+            <div className="text-2xl font-bold">
+              {stats.avgConversionRate > 0 ? `${stats.avgConversionRate.toFixed(2)}%` : "—"}
+            </div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-emerald-500 inline-flex items-center">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                0.8%
-              </span>{" "}
-              from last month
+              Average across all sites
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lift vs Baseline</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Variants</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-500">+{stats.improvementVsBaseline}%</div>
+            <div className="text-2xl font-bold">{stats.totalVariants}</div>
             <p className="text-xs text-muted-foreground">
-              Across all active experiments
+              Being tested
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Performing Variants */}
+      {/* Sites Performance */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Performing Variants</CardTitle>
+          <CardTitle>Site Performance</CardTitle>
           <CardDescription>
-            Your best converting variants across all sites
+            Performance breakdown by site
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {topVariants.map((variant, index) => (
-              <div
-                key={variant.id}
-                className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="font-medium">{variant.headline}</p>
-                    <p className="text-sm text-muted-foreground">{variant.site}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Visitors</p>
-                    <p className="font-medium">{variant.visitors.toLocaleString()}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Conv. Rate</p>
-                    <p className="font-bold text-emerald-500">{variant.conversionRate}%</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {sites.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No sites yet. Add a site to start tracking performance.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {sites.map((site) => {
+                let hostname = site.url
+                try {
+                  hostname = new URL(site.url).hostname
+                } catch {
+                  // Use full URL if parsing fails
+                }
+                return (
+                  <Link
+                    key={site.id}
+                    href={`/dashboard/sites/${site.id}`}
+                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                        <Globe className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{hostname}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {site.variant_count || 0} variant{(site.variant_count || 0) !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Visitors</p>
+                        <p className="font-medium">{(site.visitors || 0).toLocaleString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Conv. Rate</p>
+                        <p className="font-bold text-emerald-500">
+                          {site.conversion_rate ? `${site.conversion_rate.toFixed(2)}%` : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
-
-      {/* Placeholder for charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversion Trends</CardTitle>
-            <CardDescription>Daily conversion rate over time</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground">
-            <div className="text-center">
-              <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Chart coming soon</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Traffic Distribution</CardTitle>
-            <CardDescription>Thompson Sampling allocation</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center text-muted-foreground">
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Chart coming soon</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   )
 }

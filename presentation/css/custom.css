@@ -30,7 +30,7 @@
 /* Base Reveal overrides */
 .reveal {
   font-family: var(--font-sans);
-  font-size: 32px;
+  font-size: 40px;
   color: var(--color-text);
 }
 

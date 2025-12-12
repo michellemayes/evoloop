@@ -8,12 +8,17 @@
 (function() {
   'use strict';
 
-  // Get API URL from script tag or default to production
+  // Get API URL from Evoloop script tag or default to production
   const getApiUrl = () => {
     const scripts = document.getElementsByTagName('script');
     for (let i = 0; i < scripts.length; i++) {
-      const apiUrl = scripts[i].getAttribute('data-api-url');
-      if (apiUrl) return apiUrl;
+      const script = scripts[i];
+      const src = script.getAttribute('src') || '';
+      // Only check data-api-url on the Evoloop script
+      if (src.includes('evoloop.js')) {
+        const apiUrl = script.getAttribute('data-api-url');
+        if (apiUrl) return apiUrl;
+      }
     }
     return 'https://api.evoloop.ai';
   };
@@ -32,12 +37,17 @@
     return visitorId;
   }
 
-  // Get site ID from script tag
+  // Get site ID from Evoloop script tag
   function getSiteId() {
     const scripts = document.getElementsByTagName('script');
     for (let i = 0; i < scripts.length; i++) {
-      const siteId = scripts[i].getAttribute('data-site-id');
-      if (siteId) return siteId;
+      const script = scripts[i];
+      const src = script.getAttribute('src') || '';
+      // Only check data-site-id on the Evoloop script
+      if (src.includes('evoloop.js')) {
+        const siteId = script.getAttribute('data-site-id');
+        if (siteId) return siteId;
+      }
     }
     console.error('[Evoloop] No site ID found. Add data-site-id to the script tag.');
     return null;

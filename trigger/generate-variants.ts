@@ -52,13 +52,13 @@ export const generateVariantsTask = task({
         cta: "Get Started Now",
       }
 
-      // Step 2: Generate image if enabled via Nano Banana
+      // Step 2: Generate image if enabled via OpenRouter (Nano Banana)
       if (includeImages) {
-        const imageResponse = await fetch("https://nanobanana.com/api/v1/images/generations", {
+        const imageResponse = await fetch("https://openrouter.ai/api/v1/images/generations", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NANOBANANA_API_KEY}`,
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           },
           body: JSON.stringify({
             model: "google/gemini-2.5-flash-image-preview",
@@ -68,7 +68,7 @@ export const generateVariantsTask = task({
 
         if (imageResponse.ok) {
           const imageData = await imageResponse.json()
-          variant.heroImage = imageData.url
+          variant.heroImage = imageData.data?.[0]?.url
         }
       }
 

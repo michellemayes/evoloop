@@ -30,7 +30,7 @@
 /* Base Reveal overrides */
 .reveal {
   font-family: var(--font-sans);
-  font-size: 42px;
+  font-size: 32px;
   color: var(--color-text);
 }
 
@@ -38,8 +38,10 @@
   text-align: left;
 }
 
-.reveal .slides section {
-  padding: var(--space-lg);
+.reveal .slides > section,
+.reveal .slides > section > section {
+  padding: 40px 60px;
+  box-sizing: border-box;
 }
 
 /* Typography */

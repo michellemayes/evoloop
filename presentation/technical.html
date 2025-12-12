@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evoloop - Technical Deep-Dive</title>
+
+  <!-- Reveal.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+
+  <!-- Highlight.js for code -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/custom.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+  <!-- Slide 1: Title -->
+  <section data-background-color="#10b981" class="center">
+    <h1 style="color: white; font-size: 2.2em;">Evoloop</h1>
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.1em; margin-top: var(--space-sm);">
+      Technical Deep-Dive
+    </p>
+    <div style="margin-top: var(--space-lg); color: rgba(255,255,255,0.7); font-size: 0.7em;">
+      <p>Architecture | Testing | Algorithms | Infrastructure</p>
+    </div>
+  </section>
+
+  <!-- Slide 2: Architecture Overview -->
+  <section>
+    <h2>Architecture <span class="highlight">Overview</span></h2>
+    <div style="margin-top: var(--space-md); display: flex; flex-direction: column; align-items: center; gap: var(--space-xs);">
+      <div class="architecture-box fragment fade-up" style="width: 400px; background: var(--color-primary); color: white; border-color: var(--color-primary);">
+        <strong>Client Layer</strong><br>
+        <span style="font-size: 0.7em;">Next.js 16 | React 19 | shadcn/ui</span>
+      </div>
+      <div class="architecture-arrow fragment fade-up">↓↑</div>
+      <div class="architecture-box fragment fade-up" style="width: 400px;">
+        <strong>API Layer</strong><br>
+        <span style="font-size: 0.7em;">FastAPI | Pydantic | Thompson Sampling</span>
+      </div>
+      <div class="architecture-arrow fragment fade-up">↓↑</div>
+      <div class="architecture-box fragment fade-up" style="width: 400px;">
+        <strong>Data Layer</strong><br>
+        <span style="font-size: 0.7em;">Neon Postgres | SQLAlchemy 2.0 | Alembic</span>
+      </div>
+      <div class="architecture-arrow fragment fade-up">↔</div>
+      <div class="architecture-box fragment fade-up" style="width: 400px;">
+        <strong>Background Jobs</strong><br>
+        <span style="font-size: 0.7em;">Trigger.dev | Variant Generation | Stats Updates</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Tech Stack -->
+  <section>
+    <h2>Tech <span class="highlight">Stack</span></h2>
+    <div class="grid-2" style="margin-top: var(--space-md); font-size: 0.75em;">
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Frontend</h3>
+        <table class="comparison">
+          <tr><td>Framework</td><td><strong>Next.js 16.0.10</strong></td></tr>
+          <tr><td>UI Library</td><td><strong>React 19.2.1</strong></td></tr>
+          <tr><td>Components</td><td><strong>shadcn/ui + Radix</strong></td></tr>
+          <tr><td>Styling</td><td><strong>Tailwind CSS 4</strong></td></tr>
+          <tr><td>Icons</td><td><strong>Lucide React</strong></td></tr>
+          <tr><td>Auth</td><td><strong>Stack Auth</strong></td></tr>
+        </table>
+      </div>
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Backend</h3>
+        <table class="comparison">
+          <tr><td>Framework</td><td><strong>FastAPI</strong></td></tr>
+          <tr><td>Validation</td><td><strong>Pydantic 2.0</strong></td></tr>
+          <tr><td>ORM</td><td><strong>SQLAlchemy 2.0</strong></td></tr>
+          <tr><td>Database</td><td><strong>Neon Postgres</strong></td></tr>
+          <tr><td>Migrations</td><td><strong>Alembic</strong></td></tr>
+          <tr><td>Jobs</td><td><strong>Trigger.dev</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Database Schema -->
+  <section>
+    <h2>Database <span class="highlight">Schema</span></h2>
+    <div style="margin-top: var(--space-sm); font-size: 0.55em; font-family: var(--font-mono);">
+      <div class="grid-3" style="gap: var(--space-sm);">
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">Users</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">id: UUID (PK)
+email: String(255)
+password_hash: String
+plan: "free" | "pro"
+settings: JSON</pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">Sites</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">id: UUID (PK)
+user_id: FK → Users
+url: String(2048)
+status: analyzing|running
+autonomy_mode: String
+brand_constraints: JSON</pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">Variants</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">id: UUID (PK)
+site_id: FK → Sites
+parent_variant_id: FK
+patch: JSON
+status: active|killed
+generation_reasoning: Text</pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">ExperimentStats</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">variant_id: UUID (PK)
+visitors: Integer
+conversions: Integer
+alpha: Float (beta param)
+beta: Float (beta param)
+prob_best: Float</pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">Events</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">id: UUID (PK)
+site_id: FK (indexed)
+variant_id: FK
+visitor_id: String (indexed)
+event_type: impression|conversion
+created_at: DateTime (indexed)</pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-sm);">
+          <strong style="color: var(--color-primary);">ConversionGoals</strong>
+          <pre style="margin: var(--space-xs) 0; font-size: 0.9em; background: none; box-shadow: none; padding: 0;">id: UUID (PK)
+site_id: FK → Sites
+type: String(50)
+config: JSON
+created_at: DateTime</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Thompson Sampling -->
+  <section>
+    <h2>Thompson <span class="highlight">Sampling</span></h2>
+    <p class="muted" style="font-size: 0.8em;">Multi-armed bandit for optimal traffic allocation</p>
+    <div style="margin-top: var(--space-sm);">
+      <pre><code class="language-python">class ThompsonSampler:
+    @staticmethod
+    def select_variant(variants: List[Tuple[str, float, float]],
+                       visitor_id: str = None) -> str:
+        """Select variant using beta distribution sampling"""
+        if visitor_id:
+            # Deterministic assignment per visitor
+            seed = int(hashlib.md5(visitor_id.encode()).hexdigest()[:8], 16)
+            random.seed(seed)
+
+        # Sample from beta distribution for each variant
+        samples = [(v[0], random.betavariate(v[1], v[2])) for v in variants]
+
+        # Return variant with highest sample
+        return max(samples, key=lambda x: x[1])[0]
+
+    @staticmethod
+    def calculate_prob_best(variants, num_simulations=10000) -> dict:
+        """Monte Carlo simulation for probability of being best"""
+        win_counts = {v[0]: 0 for v in variants}
+        for _ in range(num_simulations):
+            samples = [(v[0], random.betavariate(v[1], v[2])) for v in variants]
+            win_counts[max(samples, key=lambda x: x[1])[0]] += 1
+        return {v: count / num_simulations for v, count in win_counts.items()}</code></pre>
+    </div>
+  </section>
+
+  <!-- Slide 6: API Design -->
+  <section>
+    <h2>API <span class="highlight">Design</span></h2>
+    <p class="muted" style="font-size: 0.75em;">15+ RESTful endpoints with Pydantic validation</p>
+    <div class="grid-2" style="margin-top: var(--space-sm); font-size: 0.6em;">
+      <div>
+        <h3 style="font-size: 1em; margin-bottom: var(--space-xs);">Protected Routes <span class="muted">/api</span></h3>
+        <table class="comparison">
+          <tr><td><code>POST</code></td><td>/auth/signup</td><td>User registration</td></tr>
+          <tr><td><code>POST</code></td><td>/auth/login</td><td>Authentication</td></tr>
+          <tr><td><code>GET</code></td><td>/sites</td><td>List user sites</td></tr>
+          <tr><td><code>POST</code></td><td>/sites</td><td>Create site</td></tr>
+          <tr><td><code>PATCH</code></td><td>/sites/:id</td><td>Update site</td></tr>
+          <tr><td><code>DELETE</code></td><td>/sites/:id</td><td>Delete (cascade)</td></tr>
+          <tr><td><code>GET</code></td><td>/variants</td><td>List variants</td></tr>
+          <tr><td><code>PATCH</code></td><td>/variants/:id</td><td>Update status</td></tr>
+          <tr><td><code>GET</code></td><td>/stats/site/:id</td><td>Aggregated stats</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3 style="font-size: 1em; margin-bottom: var(--space-xs);">Public Routes <span class="muted">/v1</span></h3>
+        <table class="comparison">
+          <tr><td><code>GET</code></td><td>/assign</td><td>Get variant assignment</td></tr>
+          <tr><td><code>POST</code></td><td>/event</td><td>Track impression/conversion</td></tr>
+        </table>
+        <div style="margin-top: var(--space-md);">
+          <h3 style="font-size: 1em; margin-bottom: var(--space-xs);">Request Validation</h3>
+          <pre style="font-size: 0.9em;"><code class="language-python">class EventRequest(BaseModel):
+    site_id: str
+    variant_id: str
+    visitor_id: str
+    type: Literal["impression", "conversion"]
+    metadata: Optional[Dict] = None</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Test Coverage -->
+  <section>
+    <h2>Test <span class="highlight">Coverage</span></h2>
+    <div class="grid-2" style="margin-top: var(--space-md);">
+      <div>
+        <div class="card" style="text-align: center; padding: var(--space-md);">
+          <div class="stat" style="color: var(--color-success);">90%</div>
+          <div class="stat-label">Minimum Required</div>
+          <p class="muted" style="font-size: 0.7em; margin-top: var(--space-sm);">--cov-fail-under=90</p>
+        </div>
+        <div style="margin-top: var(--space-md); font-size: 0.7em;">
+          <p><strong>Test Framework:</strong> pytest + pytest-cov</p>
+          <p><strong>Async Support:</strong> pytest-asyncio</p>
+          <p><strong>Test DB:</strong> SQLite in-memory</p>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Test Suite (26 tests)</h3>
+        <table class="comparison" style="font-size: 0.8em;">
+          <tr><td>test_auth.py</td><td>4 tests</td><td>Signup/Login</td></tr>
+          <tr><td>test_sites.py</td><td>5 tests</td><td>CRUD ops</td></tr>
+          <tr><td>test_variants.py</td><td>5 tests</td><td>Lifecycle</td></tr>
+          <tr><td>test_runtime.py</td><td>4 tests</td><td>Assignment</td></tr>
+          <tr><td>test_thompson.py</td><td>9 tests</td><td>Algorithm</td></tr>
+          <tr><td>test_health.py</td><td>1 test</td><td>Health check</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Frontend Stack -->
+  <section>
+    <h2>Frontend <span class="highlight">Architecture</span></h2>
+    <div class="grid-2" style="margin-top: var(--space-md);">
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Component Structure</h3>
+        <pre style="font-size: 0.7em;"><code class="language-bash">/components
+├── ui/           # 16 shadcn primitives
+│   ├── button.tsx
+│   ├── card.tsx
+│   ├── dialog.tsx
+│   └── ...
+├── dashboard/
+│   ├── header.tsx
+│   └── sidebar.tsx
+└── landing/
+    ├── animated-section.tsx
+    └── variant-visualization.tsx
+
+/app
+├── page.tsx           # Landing (15KB)
+├── layout.tsx         # Root + Auth Provider
+├── (dashboard)/       # Protected routes
+└── handler/           # Auth handlers</code></pre>
+      </div>
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Key Patterns</h3>
+        <div class="card" style="padding: var(--space-sm); margin-bottom: var(--space-sm);">
+          <strong>App Router</strong>
+          <p class="muted" style="font-size: 0.7em; margin: 0;">Next.js 16 with React Server Components</p>
+        </div>
+        <div class="card" style="padding: var(--space-sm); margin-bottom: var(--space-sm);">
+          <strong>Type Safety</strong>
+          <p class="muted" style="font-size: 0.7em; margin: 0;">Full TypeScript, strict mode enabled</p>
+        </div>
+        <div class="card" style="padding: var(--space-sm); margin-bottom: var(--space-sm);">
+          <strong>Auth Integration</strong>
+          <p class="muted" style="font-size: 0.7em; margin: 0;">Stack Auth with StackProvider wrapper</p>
+        </div>
+        <div class="card" style="padding: var(--space-sm);">
+          <strong>Testing</strong>
+          <p class="muted" style="font-size: 0.7em; margin: 0;">Vitest + React Testing Library</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9: Background Jobs -->
+  <section>
+    <h2>Background <span class="highlight">Jobs</span></h2>
+    <p class="muted" style="font-size: 0.8em;">Trigger.dev for async variant generation and stats updates</p>
+    <div style="margin-top: var(--space-md);">
+      <div class="grid-3">
+        <div class="card fragment fade-up" style="text-align: center; padding: var(--space-sm);">
+          <div class="icon" style="background: var(--color-primary);">1</div>
+          <h3 style="font-size: 0.85em;">Page Analysis</h3>
+          <p class="muted" style="font-size: 0.65em;">Scrape URL, extract brand constraints, identify mutable elements</p>
+        </div>
+        <div class="card fragment fade-up" style="text-align: center; padding: var(--space-sm);">
+          <div class="icon" style="background: var(--color-primary);">2</div>
+          <h3 style="font-size: 0.85em;">Variant Generation</h3>
+          <p class="muted" style="font-size: 0.65em;">LLM-powered copy, optional image generation via OpenRouter</p>
+        </div>
+        <div class="card fragment fade-up" style="text-align: center; padding: var(--space-sm);">
+          <div class="icon" style="background: var(--color-primary);">3</div>
+          <h3 style="font-size: 0.85em;">Stats Update</h3>
+          <p class="muted" style="font-size: 0.65em;">Aggregate events, recalculate beta params, update prob_best</p>
+        </div>
+      </div>
+      <pre style="margin-top: var(--space-md); font-size: 0.65em;"><code class="language-typescript">// trigger/generate-variants.ts
+export const generateVariants = task({
+  id: "generate-variants",
+  run: async (payload: { siteId: string }) => {
+    const site = await getSite(payload.siteId);
+    const constraints = site.brand_constraints;
+
+    const variants = await openrouter.generate({
+      model: "anthropic/claude-sonnet",
+      prompt: buildVariantPrompt(site, constraints)
+    });
+
+    await saveVariants(site.id, variants);
+  }
+});</code></pre>
+    </div>
+  </section>
+
+  <!-- Slide 10: Security & Auth -->
+  <section>
+    <h2>Security & <span class="highlight">Auth</span></h2>
+    <div class="grid-2" style="margin-top: var(--space-md);">
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Authentication Flow</h3>
+        <div class="card" style="padding: var(--space-sm); margin-bottom: var(--space-sm);">
+          <strong>Frontend: Stack Auth</strong>
+          <p class="muted" style="font-size: 0.7em; margin: var(--space-xs) 0 0 0;">
+            OAuth providers, session management, protected routes
+          </p>
+        </div>
+        <div class="card" style="padding: var(--space-sm);">
+          <strong>Backend: Custom + Salt</strong>
+          <pre style="font-size: 0.75em; margin: var(--space-xs) 0 0 0;"><code class="language-python">def hash_password(password: str) -> str:
+    salt = os.environ.get("PASSWORD_SALT")
+    return hashlib.sha256(
+        f"{password}{salt}".encode()
+    ).hexdigest()</code></pre>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Security Measures</h3>
+        <ul style="font-size: 0.75em;">
+          <li><strong>UUID Primary Keys</strong> - Non-sequential, unpredictable</li>
+          <li><strong>User Isolation</strong> - All queries filtered by user_id</li>
+          <li><strong>Cascade Deletes</strong> - No orphaned data</li>
+          <li><strong>Input Validation</strong> - Pydantic on all endpoints</li>
+          <li><strong>Email Validation</strong> - EmailStr type enforcement</li>
+          <li><strong>Environment Secrets</strong> - No hardcoded credentials</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 11: Deployment -->
+  <section>
+    <h2>Deployment <span class="highlight">Architecture</span></h2>
+    <div style="margin-top: var(--space-md);">
+      <div class="grid-2">
+        <div class="card fragment fade-up" style="padding: var(--space-md);">
+          <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Vercel</h3>
+          <ul style="font-size: 0.7em; margin: 0;">
+            <li>Next.js frontend (Edge Runtime)</li>
+            <li>Python API (Serverless Functions)</li>
+            <li>Automatic preview deployments</li>
+            <li>Global CDN distribution</li>
+          </ul>
+          <pre style="font-size: 0.7em; margin-top: var(--space-sm);"><code class="language-json">// vercel.json
+{
+  "rewrites": [
+    { "source": "/api/:path*",
+      "destination": "/api/index.py" },
+    { "source": "/v1/:path*",
+      "destination": "/api/index.py" }
+  ]
+}</code></pre>
+        </div>
+        <div class="card fragment fade-up" style="padding: var(--space-md);">
+          <h3 style="font-size: 0.9em; margin-bottom: var(--space-sm);">Neon Postgres</h3>
+          <ul style="font-size: 0.7em; margin: 0;">
+            <li>Serverless PostgreSQL</li>
+            <li>Auto-scaling to zero</li>
+            <li>Database branching for previews</li>
+            <li>Connection pooling built-in</li>
+          </ul>
+          <pre style="font-size: 0.7em; margin-top: var(--space-sm);"><code class="language-python"># Connection with health check
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True
+)</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 12: Metrics Summary -->
+  <section data-background-color="#10b981" class="center">
+    <h2 style="color: white;">By The <span style="opacity: 0.8;">Numbers</span></h2>
+    <div class="grid-3" style="margin-top: var(--space-md);">
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">90%</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">Test Coverage</div>
+      </div>
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">26</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">Test Cases</div>
+      </div>
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">15+</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">API Endpoints</div>
+      </div>
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">6</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">Database Tables</div>
+      </div>
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">20+</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">UI Components</div>
+      </div>
+      <div class="fragment fade-up" style="text-align: center; color: white;">
+        <div style="font-size: 2.5em; font-weight: 800;">10K</div>
+        <div style="font-size: 0.7em; opacity: 0.8;">Monte Carlo Sims</div>
+      </div>
+    </div>
+    <p class="fragment fade-up" style="margin-top: var(--space-lg); color: rgba(255,255,255,0.8); font-size: 0.8em;">
+      Production-ready. Type-safe. Statistically rigorous.
+    </p>
+  </section>
+
+</div>
+  </div>
+
+  <!-- Reveal.js -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      backgroundTransition: 'fade',
+      width: 1920,
+      height: 1080,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      plugins: [RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+</html>

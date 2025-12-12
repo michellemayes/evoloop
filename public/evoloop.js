@@ -57,7 +57,7 @@
   async function fetchVariant(siteId, visitorId) {
     try {
       const response = await fetch(
-        `${EVOLOOP_API}/v1/assign?site_id=${siteId}&visitor_id=${visitorId}`
+        `${EVOLOOP_API}/api/v1/assign?site_id=${siteId}&visitor_id=${visitorId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -125,7 +125,7 @@
     if (!siteId || !variantData.variant_id) return;
 
     try {
-      await fetch(`${EVOLOOP_API}/v1/event`, {
+      await fetch(`${EVOLOOP_API}/api/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

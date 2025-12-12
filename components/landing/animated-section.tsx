@@ -38,9 +38,10 @@ export function AnimatedSection({ children, className = "", delay = 0 }: Animate
       ref={ref}
       className={`transition-all duration-700 ease-out ${
         isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-8"
+          ? "opacity-100"
+          : "opacity-0"
       } ${className}`}
+      style={{ willChange: 'opacity' }}
     >
       {children}
     </div>

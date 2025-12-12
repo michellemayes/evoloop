@@ -115,7 +115,7 @@ export const analyzeSiteTask = task({
     const brandConstraints = await extractBrandConstraintsViaOpenRouter(url, html)
 
     // Step 3: Update site in database (and move to running so runtime can serve)
-    const response = await fetch(`${process.env.API_URL}/api/sites/${siteId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/sites/${siteId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

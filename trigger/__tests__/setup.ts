@@ -3,7 +3,7 @@ import { vi } from 'vitest'
 // Mock process.env for trigger tests
 process.env = {
   ...process.env,
-  API_URL: 'http://localhost:8000',
+  NEXT_PUBLIC_API_URL: 'http://localhost:8000',
   OPENROUTER_API_KEY: 'test-openrouter-key',
   TRIGGER_SECRET_KEY: 'test-trigger-key',
 }

@@ -4,7 +4,8 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load environment variables from parent directory
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '..', '.env.local'))
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 

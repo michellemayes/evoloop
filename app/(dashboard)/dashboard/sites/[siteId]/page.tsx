@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,6 +26,26 @@ import {
   Eye,
   Target,
 } from "lucide-react"
+import { toast } from "sonner"
+
+interface Site {
+  id: string
+  url: string
+  status: "analyzing" | "analyzed" | "running" | "paused"
+  autonomy_mode: "supervised" | "training_wheels" | "full_auto"
+  approvals_remaining: number
+  brand_constraints: Record<string, any>
+  image_generation_enabled: boolean
+  created_at: string
+  updated_at?: string
+}
+
+interface VariantStats {
+  visitors: number
+  conversions: number
+  conversion_rate: number
+  prob_best: number
+}
 
 interface Variant {
   id: string
@@ -36,7 +56,8 @@ interface Variant {
     cta?: string
     heroImage?: string
   }
-  visitors: number
+  stats: VariantStats
+  visitors: number // For backwards compatibility
   conversions: number
   conversionRate: number
   probBest: number
@@ -48,18 +69,237 @@ export default function SiteDetailPage() {
   const params = useParams()
   const siteId = params.siteId as string
 
-  const [autonomyMode, setAutonomyMode] = useState<AutonomyMode>("training_wheels")
-  const [imageGeneration, setImageGeneration] = useState(false)
+  const [site, setSite] = useState<Site | null>(null)
   const [variants, setVariants] = useState<Variant[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [isStarting, setIsStarting] = useState(false)
+  const [updatingStats, setUpdatingStats] = useState(false)
 
-  const handleApprove = (variantId: string) => {
-    // TODO: Call API to approve variant
-    console.log("Approving variant:", variantId)
+  // Sync local state with site data
+  const autonomyMode = site?.autonomy_mode as AutonomyMode || "training_wheels"
+  const imageGeneration = site?.image_generation_enabled || false
+
+  useEffect(() => {
+    fetchSiteData()
+    fetchVariants()
+  }, [siteId])
+
+  const fetchSiteData = async () => {
+    try {
+      const res = await fetch(`/api/sites/${siteId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setSite(data)
+      } else {
+        setError("Failed to load site data")
+      }
+    } catch (error) {
+      console.error("Failed to fetch site:", error)
+      setError("Failed to load site data")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleKill = (variantId: string) => {
-    // TODO: Call API to kill variant
-    console.log("Killing variant:", variantId)
+  const fetchVariants = async () => {
+    try {
+      const res = await fetch(`/api/sites/${siteId}/variants`)
+      if (res.ok) {
+        const data = await res.json()
+        // Transform backend data to match frontend interface
+        const transformedVariants = data.map((v: any) => ({
+          id: v.id,
+          status: v.status,
+          patch: v.patch || {},
+          stats: v.stats || { visitors: 0, conversions: 0, conversion_rate: 0, prob_best: 0 },
+          visitors: v.stats?.visitors || 0,
+          conversions: v.stats?.conversions || 0,
+          conversionRate: v.stats?.conversion_rate || 0,
+          probBest: v.stats?.prob_best || 0,
+        }))
+        setVariants(transformedVariants)
+      }
+    } catch (error) {
+      console.error("Failed to fetch variants:", error)
+    }
+  }
+
+  const updateSiteSettings = async (updates: Partial<Site>) => {
+    try {
+      const res = await fetch(`/api/sites/${siteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (res.ok) {
+        const updatedSite = await res.json()
+        setSite(updatedSite)
+      }
+    } catch (error) {
+      console.error("Failed to update site:", error)
+    }
+  }
+
+  const handleGenerateVariants = async () => {
+    if (!site) {
+      toast.error("Site data not loaded yet.")
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      console.log("Generating variants for site:", siteId, "URL:", site.url)
+
+      // Step 1: First analyze the site to extract brand constraints
+      const analyzeRes = await fetch('/api/trigger/analyze-site', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          siteId: siteId,
+          url: site.url,
+        }),
+      })
+
+      if (!analyzeRes.ok) {
+        const errorText = await analyzeRes.text()
+        console.error('Analyze site failed:', errorText)
+        toast.error("Failed to analyze site.")
+        return
+      }
+
+      const analyzeResult = await analyzeRes.json()
+      console.log('Site analysis completed:', analyzeResult)
+
+      // Step 2: Generate variants using the extracted brand constraints
+      const generateRes = await fetch('/api/trigger/generate-variants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          siteId: siteId,
+          brandConstraints: analyzeResult.brandConstraints,
+          count: 3, // Generate 3 variants
+          includeImages: site.image_generation_enabled,
+        }),
+      })
+
+      if (generateRes.ok) {
+        const generateResult = await generateRes.json()
+        console.log('Variant generation completed:', generateResult)
+        toast.success(`Generated ${generateResult.variantsCreated} variants!`)
+        fetchVariants() // Refresh variants list
+        fetchSiteData() // Refresh site data (brand constraints, status)
+      } else {
+        const errorText = await generateRes.text()
+        console.error('Generate variants failed:', errorText)
+        toast.error("Failed to generate variants.")
+      }
+    } catch (error) {
+      console.error("Failed to generate variants:", error)
+      toast.error("Failed to generate variants.")
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleStartExperiment = async () => {
+    setIsStarting(true)
+    try {
+      // Update site status to running
+      await updateSiteSettings({ status: "running" })
+      console.log("Experiment started for site:", siteId)
+    } catch (error) {
+      console.error("Failed to start experiment:", error)
+    } finally {
+      setIsStarting(false)
+    }
+  }
+
+  const handlePause = async () => {
+    try {
+      // Update site status to paused
+      await updateSiteSettings({ status: "paused" })
+      console.log("Experiment paused for site:", siteId)
+    } catch (error) {
+      console.error("Failed to pause experiment:", error)
+    }
+  }
+
+  const handleApprove = async (variantId: string) => {
+    try {
+      const res = await fetch(`/api/variants/${variantId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: "active" }),
+      })
+      if (res.ok) {
+        await fetchVariants() // Refresh variants list
+        console.log("Variant approved:", variantId)
+      }
+    } catch (error) {
+      console.error("Failed to approve variant:", error)
+    }
+  }
+
+  const handleKill = async (variantId: string) => {
+    try {
+      const res = await fetch(`/api/variants/${variantId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: "killed" }),
+      })
+      if (res.ok) {
+        await fetchVariants() // Refresh variants list
+        console.log("Variant killed:", variantId)
+      }
+    } catch (error) {
+      console.error("Failed to kill variant:", error)
+    }
+  }
+
+  const handleUpdateStats = async () => {
+    setUpdatingStats(true)
+    try {
+      const res = await fetch(`/api/sites/${siteId}/stats`, {
+        method: 'POST',
+      })
+      if (res.ok) {
+        // Refresh variants to get updated stats
+        await fetchVariants()
+        console.log("Stats updated successfully")
+      }
+    } catch (error) {
+      console.error("Failed to update stats:", error)
+    } finally {
+      setUpdatingStats(false)
+    }
+  }
+
+  const handleDeleteSite = async () => {
+    if (!confirm("Are you sure you want to delete this site? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/sites/${siteId}`, {
+        method: 'DELETE',
+      })
+      if (res.ok) {
+        // Redirect to sites list
+        window.location.href = '/dashboard/sites'
+      }
+    } catch (error) {
+      console.error("Failed to delete site:", error)
+    }
+  }
+
+  const handleAutonomyModeChange = (mode: AutonomyMode) => {
+    updateSiteSettings({ autonomy_mode: mode })
+  }
+
+  const handleImageGenerationChange = (enabled: boolean) => {
+    updateSiteSettings({ image_generation_enabled: enabled })
   }
 
   return (
@@ -67,20 +307,32 @@ export default function SiteDetailPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Site Details</h2>
-          <p className="text-muted-foreground">example.com</p>
+          <p className="text-muted-foreground">{new URL(site!.url).hostname}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Generate Variants
+          <Button
+            variant="outline"
+            onClick={handleGenerateVariants}
+            disabled={isGenerating}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+            {isGenerating ? 'Generating...' : 'Generate Variants'}
           </Button>
-          <Button variant="outline">
+          <Button
+            variant="outline"
+            onClick={handleUpdateStats}
+            disabled={updatingStats}
+          >
+            <TrendingUp className={`w-4 h-4 mr-2 ${updatingStats ? 'animate-pulse' : ''}`} />
+            {updatingStats ? 'Updating...' : 'Update Stats'}
+          </Button>
+          <Button variant="outline" onClick={handlePause}>
             <Pause className="w-4 h-4 mr-2" />
             Pause
           </Button>
-          <Button>
+          <Button onClick={handleStartExperiment} disabled={isStarting}>
             <Play className="w-4 h-4 mr-2" />
-            Start Experiment
+            {isStarting ? 'Starting...' : 'Start Experiment'}
           </Button>
         </div>
       </div>
@@ -103,9 +355,12 @@ export default function SiteDetailPage() {
                   Click "Generate Variants" to create AI-powered landing page
                   variations based on your site's brand constraints.
                 </p>
-                <Button>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Generate First Variants
+                <Button
+                  onClick={handleGenerateVariants}
+                  disabled={isGenerating}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                  {isGenerating ? 'Generating...' : 'Generate First Variants'}
                 </Button>
               </CardContent>
             </Card>
@@ -250,7 +505,7 @@ export default function SiteDetailPage() {
             <CardContent className="space-y-4">
               <Select
                 value={autonomyMode}
-                onValueChange={(v) => setAutonomyMode(v as AutonomyMode)}
+                onValueChange={handleAutonomyModeChange}
               >
                 <SelectTrigger className="w-[300px]">
                   <SelectValue />
@@ -282,7 +537,7 @@ export default function SiteDetailPage() {
                 <Switch
                   id="image-gen"
                   checked={imageGeneration}
-                  onCheckedChange={setImageGeneration}
+                  onCheckedChange={handleImageGenerationChange}
                 />
                 <Label htmlFor="image-gen">Enable image generation</Label>
               </div>
@@ -304,7 +559,9 @@ export default function SiteDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="destructive">Delete Site</Button>
+              <Button variant="destructive" onClick={handleDeleteSite}>
+                Delete Site
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

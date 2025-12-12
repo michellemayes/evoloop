@@ -12,8 +12,8 @@ export const updateStatsTask = task({
 
     // Fetch all active sites (or specific site)
     const sitesUrl = siteId
-      ? `${process.env.API_URL}/api/stats/update/${siteId}`
-      : `${process.env.API_URL}/api/stats/update-all`
+      ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/stats/update/${siteId}`
+      : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/stats/update-all`
 
     const response = await fetch(sitesUrl, {
       method: "POST",
@@ -34,7 +34,7 @@ export const scheduledStatsUpdate = schedules.task({
   id: "scheduled-stats-update",
   cron: "*/5 * * * *",
   run: async () => {
-    const response = await fetch(`${process.env.API_URL}/api/stats/update-all`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/stats/update-all`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     })

@@ -12,6 +12,11 @@ router = APIRouter(tags=["variants"])
 
 
 def variant_to_response(variant: Variant) -> VariantResponse:
+    # Calculate conversion rate
+    visitors = variant.stats.visitors if variant.stats else 0
+    conversions = variant.stats.conversions if variant.stats else 0
+    conversion_rate = (conversions / visitors * 100) if visitors > 0 else 0
+
     return VariantResponse(
         id=str(variant.id),
         site_id=str(variant.site_id),
@@ -22,6 +27,12 @@ def variant_to_response(variant: Variant) -> VariantResponse:
         status=variant.status,
         created_at=variant.created_at,
         killed_at=variant.killed_at,
+        stats={
+            "visitors": variant.stats.visitors if variant.stats else 0,
+            "conversions": variant.stats.conversions if variant.stats else 0,
+            "conversion_rate": conversion_rate,
+            "prob_best": variant.stats.prob_best if variant.stats else 0.0,
+        }
     )
 
 

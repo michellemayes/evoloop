@@ -105,7 +105,7 @@ export const generateVariantsTask = task({
 
     // Step 3: Create variants in database
     for (const patch of variants) {
-      await fetch(`${process.env.API_URL}/api/variants`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/variants`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

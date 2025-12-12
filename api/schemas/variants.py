@@ -15,6 +15,12 @@ class VariantUpdate(BaseModel):
     status: Optional[str] = None
 
 
+class VariantStats(BaseModel):
+    visitors: int
+    conversions: int
+    conversion_rate: float
+    prob_best: float
+
 class VariantResponse(BaseModel):
     id: str
     site_id: str
@@ -25,6 +31,7 @@ class VariantResponse(BaseModel):
     status: str
     created_at: datetime
     killed_at: Optional[datetime]
+    stats: VariantStats
 
     class Config:
         from_attributes = True

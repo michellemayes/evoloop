@@ -53,11 +53,8 @@ Autonomous landing page optimization engine that uses AI to generate, test, and 
 
    Copy `.env.example` to `.env.local` and fill in:
    ```bash
-   DATABASE_URL=postgresql://user:password@host:5432/dbname
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   NEXT_PUBLIC_STACK_PROJECT_ID=your_stack_project_id
-   NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your_stack_key
-   STACK_SECRET_SERVER_KEY=your_stack_secret
+   cp .env.example .env.local
+   # Then edit .env.local with your actual values
    ```
 
 5. **Run database migrations**
@@ -201,6 +198,13 @@ If you prefer to deploy the Python backend separately:
 Add the Evoloop script to your landing pages:
 
 ```html
+<script src="http://localhost:3000/evoloop.js"
+        data-site-id="YOUR_SITE_ID"
+        data-api-url="http://localhost:8000"></script>
+```
+
+**For production:**
+```html
 <script src="https://your-domain.com/evoloop.js" data-site-id="YOUR_SITE_ID"></script>
 ```
 
@@ -218,6 +222,62 @@ window.evoloop.trackConversion({ type: 'purchase', value: 99.99 });
 // Track custom events
 window.evoloop.trackEvent('button_click', { button_id: 'cta-main' });
 ```
+
+## Local End-to-End Testing
+
+To test the API and runtime script end-to-end locally:
+
+1. **Start both servers** (frontend on :3000, backend on :8000)
+
+2. **Create a test site via API:**
+   ```bash
+   curl -X POST http://localhost:8000/api/sites \
+     -H "Content-Type: application/json" \
+     -d '{"url": "https://example.com", "user_id": "test-user-id"}'
+   ```
+
+3. **Create a test variant:**
+   ```bash
+   curl -X POST http://localhost:8000/api/variants \
+     -H "Content-Type: application/json" \
+     -d '{
+       "site_id": "your-site-id",
+       "patch": {"headline": "Test Headline", "cta": "Test CTA"},
+       "status": "active"
+     }'
+   ```
+
+4. **Update site to running:**
+   ```bash
+   curl -X PATCH http://localhost:8000/api/sites/your-site-id \
+     -H "Content-Type: application/json" \
+     -d '{"status": "running"}'
+   ```
+
+5. **Test the runtime script:**
+   Create an HTML file with:
+   ```html
+   <!DOCTYPE html>
+   <html>
+   <head><title>Test</title></head>
+   <body>
+     <h1 id="headline">Original Headline</h1>
+     <button id="cta">Original CTA</button>
+
+     <script src="http://localhost:3000/evoloop.js"
+             data-site-id="your-site-id"
+             data-api-url="http://localhost:8000"></script>
+   </body>
+   </html>
+   ```
+
+6. **Open in browser** and check that the headline/CTA get replaced with variant content.
+
+7. **Test conversion tracking:**
+   ```javascript
+   // In browser console:
+   window.evoloop.trackConversion({ type: 'test_conversion' });
+   ```
 
 ## Project Structure
 

@@ -8,7 +8,17 @@
 (function() {
   'use strict';
 
-  const EVOLOOP_API = 'https://api.evoloop.ai';
+  // Get API URL from script tag or default to production
+  const getApiUrl = () => {
+    const scripts = document.getElementsByTagName('script');
+    for (let i = 0; i < scripts.length; i++) {
+      const apiUrl = scripts[i].getAttribute('data-api-url');
+      if (apiUrl) return apiUrl;
+    }
+    return 'https://api.evoloop.ai';
+  };
+
+  const EVOLOOP_API = getApiUrl();
   const STORAGE_KEY = 'evoloop_visitor_id';
   const VARIANT_KEY = 'evoloop_variant';
 

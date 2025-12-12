@@ -1,8 +1,5 @@
 import { vi } from 'vitest'
 
-// Mock OpenRouter API for AI calls
-global.fetch = vi.fn()
-
 // Mock process.env for trigger tests
 process.env = {
   ...process.env,
@@ -27,6 +24,10 @@ vi.mock('@trigger.dev/sdk/v3', () => ({
   },
 }))
 
+// Mock fetch globally
+const mockFetch = vi.fn()
+global.fetch = mockFetch
+
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,
@@ -34,3 +35,6 @@ global.console = {
   error: vi.fn(),
   warn: vi.fn(),
 }
+
+// Export the mock for tests to use
+export { mockFetch }

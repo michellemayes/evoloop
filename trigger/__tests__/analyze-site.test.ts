@@ -3,8 +3,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 // Import the task run function directly for testing
 import { analyzeSiteTask } from '../analyze-site'
 
-// Mock fetch globally
-const mockFetch = global.fetch as any
+// Import the mock from setup
+import { mockFetch } from './setup'
 
 describe('analyzeSiteTask', () => {
   beforeEach(() => {

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -36,7 +35,6 @@ interface Site {
 }
 
 export default function SitesPage() {
-  const { data: session } = useSession()
   const [sites, setSites] = useState<Site[]>([])
   const [newSiteUrl, setNewSiteUrl] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)

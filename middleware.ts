@@ -1,26 +1,23 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getToken } from "next-auth/jwt"
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login") ||
-                     request.nextUrl.pathname.startsWith("/signup")
+  // Stack Auth handles auth routes via /handler/[...stack]
+  // Page-level protection is recommended over middleware for Stack Auth
+  // This middleware just handles basic redirects
 
-  if (isAuthPage) {
-    if (token) {
-      return NextResponse.redirect(new URL("/dashboard", request.url))
-    }
+  const isHandlerRoute = request.nextUrl.pathname.startsWith("/handler")
+
+  if (isHandlerRoute) {
     return NextResponse.next()
-  }
-
-  if (!token && request.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/signup"],
+  matcher: [
+    // Skip static files and api routes
+    "/((?!_next/static|_next/image|favicon.ico|api/).*)",
+  ],
 }

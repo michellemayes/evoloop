@@ -291,3 +291,22 @@
 .slide-cta p {
   color: white;
 }
+
+/* PDF/print: remove shadows (they render heavy in exports) */
+@media print {
+  .reveal pre,
+  .card,
+  .architecture-box {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+}
+
+.print-pdf .reveal pre,
+.print-pdf .card,
+.print-pdf .architecture-box {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}

@@ -323,6 +323,102 @@
     </section>
   </section>
 
+  <!-- Slide 11: Architecture -->
+  <section>
+    <h2>How the pieces <span class="highlight">connect</span></h2>
+    <div style="margin-top: var(--space-md); display: flex; flex-direction: column; align-items: center; gap: var(--space-xs);">
+      <div class="architecture-box fragment fade-up" style="width: 300px;">
+        🌐 Runtime Script <span class="muted" style="font-size: 0.7em;">(Vercel Edge)</span>
+      </div>
+      <div class="architecture-arrow fragment fade-up">↓↑</div>
+      <div class="grid-2 fragment fade-up" style="gap: var(--space-sm);">
+        <div class="architecture-box">
+          ⚛️ Next.js Frontend
+        </div>
+        <div class="architecture-box">
+          🐍 FastAPI Backend
+        </div>
+      </div>
+      <div class="architecture-arrow fragment fade-up">↓↑</div>
+      <div class="architecture-box fragment fade-up" style="width: 300px;">
+        🐘 Neon Postgres
+      </div>
+      <div class="architecture-arrow fragment fade-up">↕</div>
+      <div class="grid-2 fragment fade-up" style="gap: var(--space-sm);">
+        <div class="architecture-box">
+          ⚡ Trigger.dev Jobs
+        </div>
+        <div class="architecture-box">
+          🤖 LLM APIs
+        </div>
+      </div>
+    </div>
+    <aside class="notes">
+      Build this piece by piece. Show how data flows.
+    </aside>
+  </section>
+
+  <!-- Slide 12: Thompson Sampling -->
+  <section>
+    <h2>Smarter than <span class="highlight">A/B testing</span></h2>
+    <div class="grid-2" style="margin-top: var(--space-lg);">
+      <div class="fragment fade-up">
+        <h3 style="font-size: 0.9em; color: var(--color-text-muted);">Traditional A/B</h3>
+        <ul style="font-size: 0.75em; margin-top: var(--space-sm);">
+          <li>Split traffic 50/50</li>
+          <li>Wait weeks for significance</li>
+          <li>Waste traffic on losers</li>
+        </ul>
+      </div>
+      <div class="fragment fade-up">
+        <h3 style="font-size: 0.9em; color: var(--color-primary);">Thompson Sampling</h3>
+        <ul style="font-size: 0.75em; margin-top: var(--space-sm);">
+          <li>Send more traffic to winners</li>
+          <li>Learn faster, adapt in real-time</li>
+          <li>Statistically rigorous</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card fragment fade-up" style="margin-top: var(--space-lg); text-align: center; max-width: 500px; margin-left: auto; margin-right: auto;">
+      <p style="font-size: 0.85em; margin: 0;">
+        <strong>95% credible intervals.</strong><br>
+        <span class="muted">Not gut feelings.</span>
+      </p>
+    </div>
+    <aside class="notes">
+      Make the stats accessible without dumbing it down.
+    </aside>
+  </section>
+
+  <!-- Slide 13: Tech Stack -->
+  <section>
+    <h2>Built with modern, <span class="highlight">boring</span> technology</h2>
+    <div class="grid-2" style="margin-top: var(--space-lg); max-width: 700px; margin-left: auto; margin-right: auto;">
+      <div class="card fragment fade-up" style="padding: var(--space-sm);">
+        <p class="muted" style="font-size: 0.6em; margin: 0;">FRONTEND</p>
+        <p style="font-size: 0.8em; margin-top: var(--space-xs);">Next.js 16, React 19<br>shadcn/ui, Tailwind</p>
+      </div>
+      <div class="card fragment fade-up" style="padding: var(--space-sm);">
+        <p class="muted" style="font-size: 0.6em; margin: 0;">BACKEND</p>
+        <p style="font-size: 0.8em; margin-top: var(--space-xs);">Python, FastAPI<br>SQLAlchemy 2.0</p>
+      </div>
+      <div class="card fragment fade-up" style="padding: var(--space-sm);">
+        <p class="muted" style="font-size: 0.6em; margin: 0;">DATABASE</p>
+        <p style="font-size: 0.8em; margin-top: var(--space-xs);">Neon Postgres<br>Serverless, branching</p>
+      </div>
+      <div class="card fragment fade-up" style="padding: var(--space-sm);">
+        <p class="muted" style="font-size: 0.6em; margin: 0;">INFRASTRUCTURE</p>
+        <p style="font-size: 0.8em; margin-top: var(--space-xs);">Vercel, Trigger.dev<br>Edge + Serverless</p>
+      </div>
+    </div>
+    <p class="fragment fade-up muted" style="text-align: center; margin-top: var(--space-lg); font-size: 0.8em;">
+      Proven tools. No exotic dependencies.
+    </p>
+    <aside class="notes">
+      "Boring" is a feature - signals reliability.
+    </aside>
+  </section>
+
 </div>
   </div>
 

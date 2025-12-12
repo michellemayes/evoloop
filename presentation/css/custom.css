@@ -1,0 +1,291 @@
+/* ============================================
+   Evoloop Presentation - Custom Styles
+   Light mode, landing-page-quality polish
+   ============================================ */
+
+:root {
+  /* Colors */
+  --color-background: #ffffff;
+  --color-background-alt: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-primary: #6366f1;
+  --color-primary-light: #818cf8;
+  --color-accent: #f472b6;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 6rem;
+}
+
+/* Base Reveal overrides */
+.reveal {
+  font-family: var(--font-sans);
+  font-size: 42px;
+  color: var(--color-text);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section {
+  padding: var(--space-lg);
+}
+
+/* Typography */
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: none;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.reveal h1 {
+  font-size: 2.5em;
+  font-weight: 800;
+}
+
+.reveal h2 {
+  font-size: 1.8em;
+  margin-bottom: var(--space-md);
+}
+
+.reveal h3 {
+  font-size: 1.3em;
+  color: var(--color-text-muted);
+}
+
+.reveal p {
+  line-height: 1.6;
+  margin-bottom: var(--space-sm);
+}
+
+/* Accent text */
+.reveal .highlight {
+  color: var(--color-primary);
+}
+
+.reveal .muted {
+  color: var(--color-text-muted);
+}
+
+/* Lists */
+.reveal ul, .reveal ol {
+  margin-left: 0;
+  padding-left: 1.5em;
+}
+
+.reveal li {
+  margin-bottom: var(--space-xs);
+  line-height: 1.5;
+}
+
+/* Code blocks */
+.reveal pre {
+  background: var(--color-background-alt);
+  border-radius: 12px;
+  padding: var(--space-sm);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  font-size: 0.55em;
+  width: 100%;
+  margin: var(--space-sm) 0;
+}
+
+.reveal code {
+  font-family: var(--font-mono);
+}
+
+.reveal p code {
+  background: var(--color-background-alt);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+/* Slide backgrounds */
+.reveal .slides section[data-background-color] {
+  color: white;
+}
+
+/* Fragment animations */
+.reveal .fragment.fade-up {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.reveal .fragment.fade-up.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Custom components */
+.card {
+  background: var(--color-background);
+  border-radius: 16px;
+  padding: var(--space-md);
+  box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.badge {
+  display: inline-block;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.25em 0.75em;
+  border-radius: 9999px;
+  font-size: 0.6em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Grid layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+/* Centered slides */
+.reveal .slides section.center {
+  text-align: center;
+}
+
+.reveal .slides section.center h1,
+.reveal .slides section.center h2 {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tagline style */
+.tagline {
+  font-size: 1.4em;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-top: var(--space-md);
+}
+
+/* Stats/numbers */
+.stat {
+  font-size: 3em;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9em;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+/* Comparison table */
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparison th,
+.comparison td {
+  padding: var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.comparison th {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 0.8em;
+}
+
+/* Icon placeholders */
+.icon {
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  margin-bottom: var(--space-sm);
+}
+
+/* Spectrum/slider visualization */
+.spectrum {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-background-alt);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: 9999px;
+  margin: var(--space-md) 0;
+}
+
+.spectrum-item {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-sm);
+  border-radius: 9999px;
+  font-size: 0.7em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.spectrum-item.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Architecture diagram placeholder */
+.architecture-box {
+  background: var(--color-background-alt);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8em;
+}
+
+.architecture-arrow {
+  color: var(--color-primary);
+  font-size: 1.5em;
+  margin: var(--space-xs) 0;
+}
+
+/* Slide-specific styles */
+.slide-hook h1 {
+  font-size: 2.8em;
+  max-width: 12ch;
+}
+
+.slide-cta {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+.slide-cta h2,
+.slide-cta p {
+  color: white;
+}

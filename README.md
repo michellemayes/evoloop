@@ -15,7 +15,7 @@ Autonomous landing page optimization engine that uses AI to generate, test, and 
 - **Frontend**: Next.js 16, React 19, shadcn/ui, Tailwind CSS
 - **Backend**: FastAPI (Python), SQLAlchemy, Alembic
 - **Database**: Neon PostgreSQL
-- **Auth**: NextAuth.js with credentials provider
+- **Auth**: Neon Auth (Stack Auth)
 - **Background Jobs**: Trigger.dev
 - **Deployment**: Vercel
 
@@ -54,9 +54,10 @@ Autonomous landing page optimization engine that uses AI to generate, test, and 
    Copy `.env.example` to `.env.local` and fill in:
    ```bash
    DATABASE_URL=postgresql://user:password@host:5432/dbname
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your-secret-key-here
    NEXT_PUBLIC_API_URL=http://localhost:8000
+   NEXT_PUBLIC_STACK_PROJECT_ID=your_stack_project_id
+   NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your_stack_key
+   STACK_SECRET_SERVER_KEY=your_stack_secret
    ```
 
 5. **Run database migrations**
@@ -83,6 +84,39 @@ Autonomous landing page optimization engine that uses AI to generate, test, and 
 7. **Open the app**
 
    Visit [http://localhost:3000](http://localhost:3000)
+
+## Development Scripts
+
+The `/scripts` directory contains helper scripts for common development tasks:
+
+```bash
+# Initial setup - install dependencies, create venv, configure environment
+./scripts/setup.sh
+
+# Start development servers (frontend + backend)
+./scripts/dev.sh
+
+# Run tests
+./scripts/test.sh              # All tests
+./scripts/test.sh --frontend   # Frontend only
+./scripts/test.sh --backend    # Backend only
+./scripts/test.sh --watch      # Watch mode
+
+# Database migrations
+./scripts/migrate.sh status    # Check migration status
+./scripts/migrate.sh upgrade   # Run pending migrations
+./scripts/migrate.sh create "description"  # Create new migration
+
+# Build for production
+./scripts/build.sh
+
+# Linting and type checking
+./scripts/lint.sh
+./scripts/lint.sh --fix        # Auto-fix issues
+
+# Clean build artifacts
+./scripts/clean.sh
+```
 
 ## Testing
 
@@ -119,9 +153,11 @@ python -m pytest tests/ -v
    | Variable | Description |
    |----------|-------------|
    | `DATABASE_URL` | Neon PostgreSQL connection string |
-   | `NEXTAUTH_URL` | Your production URL (e.g., `https://evoloop.vercel.app`) |
-   | `NEXTAUTH_SECRET` | Generate with `openssl rand -base64 32` |
-   | `NEXT_PUBLIC_API_URL` | Your API URL (same as NEXTAUTH_URL for Vercel) |
+   | `NEXT_PUBLIC_API_URL` | Your production URL |
+   | `NEXT_PUBLIC_STACK_PROJECT_ID` | Stack Auth project ID |
+   | `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY` | Stack Auth publishable key |
+   | `STACK_SECRET_SERVER_KEY` | Stack Auth secret key |
+   | `OPENROUTER_API_KEY` | OpenRouter API key for AI features |
 
 4. **Deploy the Python Backend**
 
@@ -188,8 +224,8 @@ window.evoloop.trackEvent('button_click', { button_id: 'cta-main' });
 ```
 evoloop/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Auth pages (login, signup)
 │   ├── (dashboard)/       # Dashboard pages
+│   ├── handler/           # Stack Auth handler routes
 │   └── api/               # Next.js API routes
 ├── api/                   # Python FastAPI backend
 │   ├── routes/            # API endpoints
@@ -200,6 +236,7 @@ evoloop/
 ├── components/            # React components
 ├── lib/                   # Shared utilities
 ├── public/                # Static assets (evoloop.js)
+├── scripts/               # Development helper scripts
 └── trigger/               # Trigger.dev background jobs
 ```
 

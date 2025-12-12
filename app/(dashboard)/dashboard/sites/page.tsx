@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Globe, ExternalLink, MoreVertical } from "lucide-react"
+import { Plus, Globe, ExternalLink, MoreVertical, Loader2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,22 +29,58 @@ interface Site {
   id: string
   url: string
   status: "analyzing" | "analyzed" | "running" | "paused"
-  autonomyMode: "supervised" | "training_wheels" | "full_auto"
-  variantCount: number
-  visitors: number
-  conversionRate: number
+  autonomy_mode: "supervised" | "training_wheels" | "full_auto"
+  variant_count?: number
+  visitors?: number
+  conversion_rate?: number
 }
 
 export default function SitesPage() {
+  const { data: session } = useSession()
   const [sites, setSites] = useState<Site[]>([])
   const [newSiteUrl, setNewSiteUrl] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
+
+  useEffect(() => {
+    fetchSites()
+  }, [])
+
+  const fetchSites = async () => {
+    try {
+      const res = await fetch("/api/sites")
+      if (res.ok) {
+        const data = await res.json()
+        setSites(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch sites:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleAddSite = async () => {
-    // TODO: Call API to create site
-    console.log("Adding site:", newSiteUrl)
-    setNewSiteUrl("")
-    setIsDialogOpen(false)
+    if (!newSiteUrl) return
+    setCreating(true)
+    try {
+      const res = await fetch("/api/sites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: newSiteUrl }),
+      })
+      if (res.ok) {
+        const newSite = await res.json()
+        setSites([...sites, newSite])
+        setNewSiteUrl("")
+        setIsDialogOpen(false)
+      }
+    } catch (error) {
+      console.error("Failed to create site:", error)
+    } finally {
+      setCreating(false)
+    }
   }
 
   const getStatusColor = (status: Site["status"]) => {
@@ -59,6 +96,14 @@ export default function SitesPage() {
       default:
         return "bg-gray-500"
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   return (
@@ -99,7 +144,16 @@ export default function SitesPage() {
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddSite}>Add Site</Button>
+              <Button onClick={handleAddSite} disabled={creating}>
+                {creating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  "Add Site"
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -167,15 +221,15 @@ export default function SitesPage() {
               <CardContent>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold">{site.variantCount}</p>
+                    <p className="text-2xl font-bold">{site.variant_count ?? 0}</p>
                     <p className="text-xs text-muted-foreground">Variants</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{site.visitors}</p>
+                    <p className="text-2xl font-bold">{site.visitors ?? 0}</p>
                     <p className="text-xs text-muted-foreground">Visitors</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{site.conversionRate}%</p>
+                    <p className="text-2xl font-bold">{(site.conversion_rate ?? 0).toFixed(1)}%</p>
                     <p className="text-xs text-muted-foreground">Conv. Rate</p>
                   </div>
                 </div>

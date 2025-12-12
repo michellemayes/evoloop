@@ -1,5 +1,6 @@
 "use client"
 
+import { useSession, signOut } from "next-auth/react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -13,6 +14,14 @@ import { Button } from "@/components/ui/button"
 import { Bell, LogOut, Settings, User } from "lucide-react"
 
 export function Header() {
+  const { data: session } = useSession()
+  const userEmail = session?.user?.email || "user@example.com"
+  const userInitial = userEmail.charAt(0).toUpperCase()
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/login" })
+  }
+
   return (
     <header className="flex items-center justify-between h-16 px-6 border-b bg-card">
       <div className="flex items-center gap-4">
@@ -26,16 +35,16 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{userInitial}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">User</p>
+                <p className="text-sm font-medium leading-none">{session?.user?.name || "User"}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  user@example.com
+                  {userEmail}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -49,7 +58,7 @@ export function Header() {
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>

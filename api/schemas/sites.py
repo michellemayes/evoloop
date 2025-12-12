@@ -9,6 +9,7 @@ class SiteCreate(BaseModel):
 
 
 class SiteUpdate(BaseModel):
+    status: Optional[str] = None
     autonomy_mode: Optional[str] = None
     brand_constraints: Optional[Dict[str, Any]] = None
     image_generation_enabled: Optional[bool] = None

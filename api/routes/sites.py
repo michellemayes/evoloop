@@ -61,6 +61,11 @@ async def update_site(site_id: str, request: SiteUpdate, db: Session = Depends(g
     if not site:
         raise HTTPException(status_code=404, detail="Site not found")
 
+    if request.status is not None:
+        allowed_statuses = {"analyzing", "analyzed", "running"}
+        if request.status not in allowed_statuses:
+            raise HTTPException(status_code=400, detail="Invalid status")
+        site.status = request.status
     if request.autonomy_mode is not None:
         site.autonomy_mode = request.autonomy_mode
     if request.brand_constraints is not None:

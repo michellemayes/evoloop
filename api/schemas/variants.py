@@ -3,6 +3,14 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 
+class VariantCreate(BaseModel):
+    site_id: str
+    patch: Dict[str, Any]
+    status: Optional[str] = None
+    parent_variant_id: Optional[str] = None
+    generation_reasoning: Optional[str] = None
+
+
 class VariantUpdate(BaseModel):
     status: Optional[str] = None
 

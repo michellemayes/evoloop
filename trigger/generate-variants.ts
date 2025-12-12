@@ -14,6 +14,16 @@ interface VariantPatch {
   heroImage?: string
 }
 
+function extractJsonObject(text: string): string | null {
+  const trimmed = text.trim()
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) return trimmed
+
+  const first = trimmed.indexOf("{")
+  const last = trimmed.lastIndexOf("}")
+  if (first === -1 || last === -1 || last <= first) return null
+  return trimmed.slice(first, last + 1)
+}
+
 export const generateVariantsTask = task({
   id: "generate-variants",
   maxDuration: 300,
@@ -24,32 +34,50 @@ export const generateVariantsTask = task({
 
     for (let i = 0; i < count; i++) {
       // Step 1: Generate text variations via OpenRouter
+      const apiKey = process.env.OPENROUTER_API_KEY
+      if (!apiKey) throw new Error("Missing OPENROUTER_API_KEY")
+
       const textResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: "anthropic/claude-3-haiku",
           messages: [
             {
               role: "system",
-              content: `Generate landing page copy variations. Brand constraints: ${JSON.stringify(brandConstraints)}`,
+              content:
+                "You generate landing page copy variants. Return ONLY valid JSON. No markdown. No commentary.",
             },
             {
               role: "user",
-              content: "Generate a headline, subheadline, and CTA button text for a landing page variation.",
+              content: [
+                "Generate a landing page variant. Return a JSON object with keys: headline, subheadline, cta.",
+                `Brand constraints: ${JSON.stringify(brandConstraints)}`,
+              ].join("\n\n"),
             },
           ],
         }),
       })
 
+      if (!textResponse.ok) {
+        throw new Error(`OpenRouter request failed: ${textResponse.status} ${textResponse.statusText}`)
+      }
+
       const textData = await textResponse.json()
+      const content: string | undefined = textData?.choices?.[0]?.message?.content
+      if (!content) throw new Error("OpenRouter returned empty content")
+
+      const jsonStr = extractJsonObject(content)
+      if (!jsonStr) throw new Error("Failed to extract JSON object from LLM output")
+      const parsed = JSON.parse(jsonStr)
+
       const variant: VariantPatch = {
-        headline: `Variant ${i + 1} Headline`,
-        subheadline: `Engaging subheadline for variant ${i + 1}`,
-        cta: "Get Started Now",
+        headline: parsed?.headline,
+        subheadline: parsed?.subheadline,
+        cta: parsed?.cta,
       }
 
       // Step 2: Generate image if enabled via OpenRouter (Nano Banana)
@@ -58,7 +86,7 @@ export const generateVariantsTask = task({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
             model: "google/gemini-2.5-flash-image-preview",
@@ -83,7 +111,6 @@ export const generateVariantsTask = task({
         body: JSON.stringify({
           site_id: siteId,
           patch,
-          status: "pending_review",
         }),
       })
     }

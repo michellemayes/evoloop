@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from db.models import User, Site, Variant
+from db.models import User, Site, Variant, ExperimentStats
 import uuid
 
 
@@ -22,6 +22,24 @@ def test_site(db_session):
 
 
 class TestVariantsEndpoints:
+    def test_create_variant_creates_stats(self, client: TestClient, db_session, test_site):
+        response = client.post(
+            "/api/variants",
+            json={
+                "site_id": str(test_site.id),
+                "patch": {"headline": "Generated"},
+            },
+        )
+        assert response.status_code == 200
+        variant_id = response.json()["id"]
+
+        stats = (
+            db_session.query(ExperimentStats)
+            .filter(ExperimentStats.variant_id == uuid.UUID(variant_id))
+            .first()
+        )
+        assert stats is not None
+
     def test_list_variants_for_site(self, client: TestClient, db_session, test_site):
         variant = Variant(
             id=uuid.uuid4(),
